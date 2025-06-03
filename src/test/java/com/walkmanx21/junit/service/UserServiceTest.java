@@ -1,16 +1,25 @@
 package com.walkmanx21.junit.service;
 
 import com.walkmanx21.junit.dto.User;
+import com.walkmanx21.junit.paramresolver.UserServiceParamResolver;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.*;
 
+import java.time.Period;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("fast")
 @Tag("user")
+@ExtendWith({
+        UserServiceParamResolver.class
+})
 public class UserServiceTest {
 
     private static final User IVAN = User.of(1, "Ivan", "123");
@@ -23,9 +32,9 @@ public class UserServiceTest {
     }
 
     @BeforeEach
-    void prepare() {
+    void prepare(UserService userService) {
         System.out.println("Before each " + this);
-        userService = new UserService();
+        this.userService = userService;
     }
 
 
@@ -104,5 +113,28 @@ public class UserServiceTest {
                     () -> assertThrows(IllegalArgumentException.class, () -> userService.login(null, "dummy"))
             );
         }
+
+        @ParameterizedTest
+//        @ArgumentsSource()
+//        @NullSource
+////        @EmptySource
+//        @ValueSource(strings = {
+//                "Ivan", "Petr"
+//        })
+        @MethodSource("com.walkmanx21.junit.service.UserServiceTest#getArgumentsForLoginTests")
+        void loginParameterizedTest(String username, String password, Optional<User> user) {
+            userService.add(IVAN, PETR);
+            Optional<User> maybeUser = userService.login(username, password);
+            assertThat(maybeUser).isEqualTo(user);
+        }
+    }
+
+    static Stream<Arguments> getArgumentsForLoginTests() {
+        return Stream.of(
+                Arguments.of("Ivan", "123", Optional.of(IVAN)),
+                Arguments.of("Petr", "111", Optional.of(PETR)),
+                Arguments.of("Ivan", "dummy", Optional.empty()),
+                Arguments.of("dummy", "123", Optional.empty())
+        );
     }
 }
