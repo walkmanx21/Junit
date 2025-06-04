@@ -1,7 +1,6 @@
-package com.walkmanx21.junit.paramresolver;
+package com.walkmanx21.junit.extension;
 
 import com.walkmanx21.junit.service.UserService;
-import com.walkmanx21.junit.service.UserServiceTest;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;

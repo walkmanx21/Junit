@@ -1,13 +1,15 @@
 package com.walkmanx21.junit.service;
 
 import com.walkmanx21.junit.dto.User;
-import com.walkmanx21.junit.paramresolver.UserServiceParamResolver;
+import com.walkmanx21.junit.extension.ConditionalExtension;
+import com.walkmanx21.junit.extension.GlobalExtension;
+import com.walkmanx21.junit.extension.PostProcessingExtension;
+import com.walkmanx21.junit.extension.UserServiceParamResolver;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 
-import java.time.Period;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -17,8 +19,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("fast")
 @Tag("user")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith({
-        UserServiceParamResolver.class
+        UserServiceParamResolver.class,
+        GlobalExtension.class,
+        PostProcessingExtension.class,
+        ConditionalExtension.class
 })
 public class UserServiceTest {
 
