@@ -1,5 +1,6 @@
 package com.walkmanx21.junit.service;
 
+import com.walkmanx21.junit.dao.UserDao;
 import com.walkmanx21.junit.dto.User;
 import com.walkmanx21.junit.extension.ConditionalExtension;
 import com.walkmanx21.junit.extension.GlobalExtension;
@@ -9,6 +10,10 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Map;
 import java.util.Optional;
@@ -24,13 +29,19 @@ import static org.junit.jupiter.api.Assertions.*;
         UserServiceParamResolver.class,
         GlobalExtension.class,
         PostProcessingExtension.class,
-        ConditionalExtension.class
+        ConditionalExtension.class,
+        MockitoExtension.class
 })
 public class UserServiceTest {
 
     private static final User IVAN = User.of(1, "Ivan", "123");
     private static final User PETR = User.of(2, "Petr", "111");
+
+    @InjectMocks
     private UserService userService;
+
+    @Mock
+    private UserDao userDao;
 
     @BeforeAll
     static void init() {
@@ -38,9 +49,22 @@ public class UserServiceTest {
     }
 
     @BeforeEach
-    void prepare(UserService userService) {
+    void prepare() {
         System.out.println("Before each " + this);
-        this.userService = userService;
+//        this.userDao = Mockito.spy(new UserDao());
+//        this.userService = new UserService(userDao);
+    }
+
+
+    @Test
+    void shouldDeleteExistedUser() {
+        userService.add(IVAN);
+        Mockito.doReturn(true).when(userDao).delete(IVAN.getId());
+//        Mockito.when(userDao.delete(IVAN.getId()))
+//                .thenReturn(true);
+//        Mockito.doReturn(true).when(userDao).delete(Mockito.any());
+        boolean deleteResult = userService.delete(1);
+        assertThat(deleteResult).isTrue();
     }
 
 
@@ -59,7 +83,6 @@ public class UserServiceTest {
         assertThat(users).hasSize(2);
 
     }
-
 
 
     @Test

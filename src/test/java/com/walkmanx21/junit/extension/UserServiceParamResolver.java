@@ -14,6 +14,6 @@ public class UserServiceParamResolver implements ParameterResolver {
 
     @Override
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return new UserService();
+        return new UserService(null);
     }
 }
